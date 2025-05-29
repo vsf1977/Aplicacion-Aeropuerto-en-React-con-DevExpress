@@ -1,0 +1,76 @@
+ul, .item{
+    list-style-type: none;
+    padding: 0px !important;
+    overflow: hidden;
+    background-color:teal;
+    margin: 0px;
+  }
+  
+  li {
+    float: left;
+  }
+  
+  a {
+    display: block;
+    text-align: center;
+    padding: 14px 16px;
+    cursor: pointer;
+  }
+  
+  li a:hover {
+    background-color: yellow;
+  }
+
+  .item > div{
+    display: flex !important;
+    flex-direction: column !important;  
+    background-color: teal;
+    margin: 5px !important;    
+  }
+
+  .item > div > li{
+    margin: 5px !important;    
+  }
+
+  .item{
+    margin: 10px !important;
+    border-radius: 15px !important;
+    border: 2px solid black;
+  }
+
+  .item > button{
+    margin: 10px !important;
+    border-radius: 15px !important;
+    border: 2px solid black;
+  }
+
+  .container{
+    margin-top: 80px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    max-width : 100%;
+  }
+
+  .nav_bar {
+    position: fixed; /* Set the navbar to fixed position */
+    top: 0; /* Position the navbar at the top of the page */
+    left: 0;
+    width: 100%; /* Full width */    
+    z-index: 5;
+  }
+
+  .actual{
+    background-color: blue;
+    text-decoration: none !important;
+    color: black !important;
+  }
+
+  .normal{
+    color: black !important;
+    text-decoration: none !important; 
+  }
+
+  .datagrid{
+    margin-top: 50px;
+  }
