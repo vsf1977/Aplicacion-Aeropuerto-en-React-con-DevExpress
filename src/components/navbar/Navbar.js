@@ -1,5 +1,6 @@
 import Info from '../info/Info'
 import { useState } from 'react';
+import { capitalize } from '../../services/tools'
 
 export default function Navbar() {
 
@@ -22,15 +23,11 @@ export default function Navbar() {
     });
   }
 
-  const capitalize = (text) => {
-    return text.charAt(0).toUpperCase() + text.slice(1);
-  }
-
   return (
     <>
       <div className="nav_bar">
         <ul id="menu">
-          {rutas.map((item, index) => (<li><a key={index} id={item} onClick={(event) => routing(event)}>{capitalize(item)}</a></li>))}
+          {rutas.map((item, index) => (<li><a className='normal' key={index} id={item} onClick={(event) => routing(event)}>{capitalize(item)}</a></li>))}
         </ul>
         <i className="fa-solid fa-plus"></i>
       </div>

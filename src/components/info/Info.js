@@ -2,12 +2,13 @@ import { useEffect, useState } from 'react';
 import DataService from '../../services/dataServices';
 import 'devextreme/dist/css/dx.light.css';
 import { DataGrid , Column , Lookup, Editing } from 'devextreme-react/data-grid';
+import { capitalize } from '../../services/tools'
 
 export default function Info({ ruta }) {
-
-  let metodo = ""
   
   const dataService = new DataService()
+
+  let operacion = "";
 
   const [data, setdata] = useState(null);
 
@@ -42,52 +43,46 @@ export default function Info({ ruta }) {
         getData(ruta)
       })
     }
-  });
+  });  
 
-  const onRowInserted = (e) =>{
-    if (!isDataOk(e.data))
-    {
-      alert("Faltan campos");
-      getData(ruta)
-    }
-    else{
-      dataService.create(ruta,e.data).then(async response => {
-      let res = await response.json();
-      console.log(res)
-      if(res != 1)
-      {
-        alert("Ocurrio un error al ingresar el registro");
-        getData(ruta)
-      }
-      else
-        alert("Registro Insertado");   
-      })
-    }
+
+  const onEditingStart = () =>{   
+    operacion = "editar"
+    console.log(operacion)
   }
 
-  const onRowUpdated = (e) =>{
-    if (!isDataOk(e.data))
-    {
-      alert("Faltan campos");
-      getData(ruta)
-    }
-    else{
-      dataService.update(ruta,e.data).then(async response => {
-      let res = await response.json();
-      console.log(res)
-      if(res != 1)
-      {
-        alert("Ocurrio un error al actulizar el registro");
-        getData(ruta)
-      }
-      else
-        alert("Registro Actualizado");   
-      })
+  const onInitNewRow = () =>{   
+    operacion = "ingresar"
+    console.log(operacion)
+    if (ruta=="ciudad"){ 
+      setTimeout(() => {
+        const input = document.getElementsByClassName('dx-texteditor-input-container').item(0).firstChild  
+        input.setAttribute("autocomplete","on")
+        input.setAttribute("list","cities")
+        const datalist = document.createElement("datalist");
+        datalist.setAttribute("id","cities")
+        input.after(datalist)
+        dataService.getAirports()
+          .then(res => {
+            let cities = []
+            res.forEach(item => {
+              cities.push(capitalize(item.city_name) + " / " + capitalize(item.name))
+            })
+            cities.sort()
+            cities.forEach(city => {
+              const option = document.createElement('option');
+              option.value = city;
+              datalist.appendChild(option);
+            })
+            input.blur()
+        })
+      }, 0);
     }
   }
 
   const onRowRemoved = (e) =>{
     dataService.delete(ruta,e.data.id).then(async response => {
+      console.log(e.data.id)
       let res = await response.json();
       if(res != 1)
       {
@@ -97,6 +92,28 @@ export default function Info({ ruta }) {
       else
         alert("Registro borrado");   
     })
+  }
+
+  const operation = (e) =>{
+    if (!isDataOk(e.data))
+    {
+      alert("Faltan campos");
+      getData(ruta)
+    }
+    else{
+      let mensaje = operacion == "ingresar" ? "Ingresado" : "Actualizado"
+      dataService.operation(ruta,e.data,operacion).then(async response => {
+        let res = await response.json();
+        console.log(res)
+        if(res != 1)
+        {
+          alert(`Ocurrio un error al ${operacion} el registro`);
+          getData(ruta)
+        }
+        else
+          alert(`Registro ${mensaje}`);   
+      })
+    }
   }
 
   const isDataOk = (data) => {
@@ -136,9 +153,11 @@ export default function Info({ ruta }) {
           <DataGrid
             dataSource={data}
             showBorders={true}
-            onRowInserted={(e) => onRowInserted(e)}
-            onRowUpdated={(e) => onRowUpdated(e)}
+            onRowInserted={(e) => operation(e)}
+            onRowUpdated={(e) => operation(e)}
             onRowRemoved={(e) => onRowRemoved(e)}
+            onInitNewRow={(e) => onInitNewRow(e)}
+            onEditingStart={(e) => onEditingStart(e)}
             >        
             {ruta === 'avion'?
                 <div>
@@ -149,7 +168,7 @@ export default function Info({ ruta }) {
                 </div>:
               ruta === 'ciudad'?
                 <div>
-                  <Column dataField="nombre" caption="Nombre"/>
+                  <Column dataField="nombre" caption="Nombre" autocomplete="on"/>
                 </div>:
               ruta === 'fabricante'?
                 <div>

@@ -1,2 +1,2 @@
-const url = 'https://localhost:7001/'
+const url = 'http://localhost:2025/'
 module.exports = url

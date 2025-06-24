@@ -17,21 +17,32 @@ export default class DataService extends Component {
     });
   }
 
-  getLookups() {
-    return Promise.all([
-        fetch(`${url}avion/getall`),
-        fetch(`${url}ciudad/getall`),
-        fetch(`${url}fabricante/getall`)])
-        .then(([avion, ciudad, fabricante]) => 
-          Promise.all([avion.json(), ciudad.json(), fabricante.json()])
-        )
-        .then(([avionList, ciudadList, fabricanteList]) => {
-          let data = []
-          data.push(avionList)
-          data.push(ciudadList)
-          data.push(fabricanteList)
-          return (data)
-        });
+  getAirports() {
+    return new Promise((resolve, reject) => {
+      fetch(url + 'Avion/GetAeropuertos')
+        .then(response => {
+          if (response.ok) {
+            return response.json();
+          }
+            throw new Error('Error fetching data');
+        })
+        .then(data => resolve(data))
+        .catch(error => reject(error));
+    });
+  }
+
+  async getLookups() {
+    const [avion, ciudad, fabricante] = await Promise.all([
+      fetch(`${url}avion/getall`),
+      fetch(`${url}ciudad/getall`),
+      fetch(`${url}fabricante/getall`)
+    ]);
+    const [avionList, ciudadList, fabricanteList] = await Promise.all([avion.json(), ciudad.json(), fabricante.json()]);
+    let data = [];
+    data.push(avionList);
+    data.push(ciudadList);
+    data.push(fabricanteList);
+    return (data);
   }
 
   delete(route,id) {
@@ -40,17 +51,11 @@ export default class DataService extends Component {
     })
   }
 
-  update(route,item) {
-    return fetch(url + route + '/update', {
-      method: 'PUT',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify(item)
-    })
-  }
-
-  create(route,item) {
-    return fetch(url + route + '/Insert', {
-      method: 'POST',
+  operation(route,item,operacion) {
+    let method = operacion == "ingresar" ? "POST" : "PUT"
+    let path = operacion == "ingresar" ? "/Insert" : "/Update"
+    return fetch(url + route + path, {
+      method: method,
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify(item)
     })
